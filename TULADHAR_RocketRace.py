@@ -1,32 +1,22 @@
-'''
-Student Name: Abheek Tuladhar 
-Game title: Rocket Race
-Period: 4 - HCP
-Features of Game: Choose a rocket to win a race!
-'''
-
 import pygame, sys, random
-pygame.init()                                         # Initialize game engine
+pygame.init()
 
-# declare global variables here
-WIDTH = 680                                           # Set window size
+WIDTH = 680
 HEIGHT = WIDTH * 1.4
-BLACK    = (0, 0, 0)                                  # Color Constants 
+BLACK    = (0, 0, 0)
 WHITE    = (255, 255, 255)
 GREEN    = (0, 255, 0)
 RED      = (255, 0, 0)
 BLUE     = ( 0, 0, 255)
 
-# Other global variables (WARNING: use sparingly):
-
-# There are 50 units across and 40 units below
+# There are 50 units across and 40 units below. Basically makes the screen a graph. xu is x_units and yu is y_units
 xu = WIDTH / 50
 yu = HEIGHT/ 40
 
 size = (WIDTH, HEIGHT)
 surface = pygame.display.set_mode(size)
 
-pygame.display.set_caption("ROCKET RACE!!!")          # Window title
+pygame.display.set_caption("ROCKET RACE!!!")         
 bg = pygame.image.load("SpaceBackground.jpg").convert_alpha()
 red = pygame.image.load("red.png").convert_alpha()
 blue = pygame.image.load("blue.png").convert_alpha()
@@ -43,7 +33,8 @@ win = 0
 lose = 0
 set_score = False
 
-clock = pygame.time.Clock()                            # Manage timing for screen updates
+clock = pygame.time.Clock()                     
+
 
 def initRockets():
     redRect.bottom = HEIGHT
@@ -150,22 +141,22 @@ def drawScreen(game_in_play, choice):
 
 
 # -------- Main Program Loop -----------
-def main():                                # every program should have a main function
+def main():                          
     global set_score
 
-    initRockets()                          # other functions go above main
+    initRockets()                    
 
     # local  variables  
     game_in_play = False
     choice = None
     
     while True:
-        for event in pygame.event.get():   # captures state of the game - loops thru changes
-            if (event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE)):  # end game
+        for event in pygame.event.get():
+            if (event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE)):  # end game conditions
                 pygame.quit()                          
                 sys.exit()
 
-            # button, mouse, or keyboard interaction here
+            # user interactions
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 mouse_pos = pygame.mouse.get_pos()
                 if choose_bound_red.collidepoint(mouse_pos):
@@ -179,7 +170,6 @@ def main():                                # every program should have a main fu
                 game_in_play = True
                 set_score = True
 
-        # ongoing game logic here  (repeats every 1/60 second) 
 
         redspeed = random.randint(1, 10)
         bluespeed = random.randint(1, 10)
@@ -200,8 +190,7 @@ def main():                                # every program should have a main fu
             choose_bound_blue = show_message("Choose Blue Rocket", "Consolas", WIDTH//40, 25*xu, HEIGHT - (5*yu), WHITE, BLUE, True)
             choose_bound_green = show_message("Choose Green Rocket", "Consolas", WIDTH//40, 42*xu, HEIGHT - (5*yu), WHITE, GREEN, True)
         
-        pygame.display.update()                         # updates the screen-
-        clock.tick(60)                                  # FPS for animation (lower number to slow)
-        
+        pygame.display.update()                        
+        clock.tick(60)                                  
 #----------------------------------------------------------------            
-main()                                                  # runs the game
+main()
