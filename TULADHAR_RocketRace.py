@@ -1,22 +1,24 @@
 import pygame, sys, random
-pygame.init()
+pygame.init()                                
 
-WIDTH = 680
+WIDTH = 680                                  
 HEIGHT = WIDTH * 1.4
+
+#Colors
 BLACK    = (0, 0, 0)
 WHITE    = (255, 255, 255)
 GREEN    = (0, 255, 0)
 RED      = (255, 0, 0)
 BLUE     = ( 0, 0, 255)
 
-# There are 50 units across and 40 units below. Basically makes the screen a graph. xu is x_units and yu is y_units
+# There are 50 units across and 40 units below
 xu = WIDTH / 50
 yu = HEIGHT/ 40
 
 size = (WIDTH, HEIGHT)
 surface = pygame.display.set_mode(size)
 
-pygame.display.set_caption("ROCKET RACE!!!")         
+pygame.display.set_caption("Rocket Race by Abheek Tuladhar")          # Window title
 bg = pygame.image.load("SpaceBackground.jpg").convert_alpha()
 red = pygame.image.load("red.png").convert_alpha()
 blue = pygame.image.load("blue.png").convert_alpha()
@@ -33,10 +35,15 @@ win = 0
 lose = 0
 set_score = False
 
-clock = pygame.time.Clock()                     
+clock = pygame.time.Clock()
 
+#----------------------------------------------
+#FUNCTIONS:
 
 def initRockets():
+    """
+    Initializes the 3 rockets to the bottom of the screen
+    """
     redRect.bottom = HEIGHT
     blueRect.bottom = HEIGHT
     greenRect.bottom = HEIGHT
@@ -47,6 +54,9 @@ def initRockets():
 
 
 def show_message(words, font_name, size, x, y, color, bg=None, hover=False):
+    """
+    Blits text onto the screen
+    """
     font = pygame.font.SysFont(font_name, size, True, False)
     text_image = font.render(words, True, color, bg)
     text_bounds = text_image.get_rect()  # bounding box of the text image
@@ -64,6 +74,10 @@ def show_message(words, font_name, size, x, y, color, bg=None, hover=False):
 
 
 def get_winner(choice):
+    """
+    Takes in put of what rocket was chosen
+    Returns whether you tied, won, lost, and how many points you get from that
+    """
     green = False
     blue = False
     red = False
@@ -111,9 +125,10 @@ def get_winner(choice):
     return "", ""
 
 
-def drawScreen(game_in_play, choice):
-    global win, lose, set_score
-
+def drawScreen(game_in_play, choice, win, lose):
+    """
+    Draws everything you see on the screen
+    """
     surface.blit(bg, (0, 0))
     surface.blit(red, redRect)
     surface.blit(blue, blueRect) 
@@ -127,37 +142,40 @@ def drawScreen(game_in_play, choice):
         winner, ifwinner = get_winner(choice)
         show_message(str(winner), "Consolas", WIDTH//7, WIDTH//2, HEIGHT//2 + (2*yu), BLACK)
         show_message(str(ifwinner), "Consolas", WIDTH//7, WIDTH//2, HEIGHT//2 - (2*yu), BLACK)
-        if set_score:
-            if ifwinner == "You Win":
-                win += 1
-            elif ifwinner == "You Lose":
-                lose += 1
-            set_score = False
+      
 
         win_message = "Wins: " + str(win)
         lose_message = "Lose: " + str(lose)
         show_message(win_message, "Consolas", WIDTH//30, WIDTH//2, 27*yu, BLACK, WHITE)
         show_message(lose_message, "Consolas", WIDTH//30, WIDTH//2, 28*yu, BLACK, WHITE)
+        if not game_in_play:
+            choose_bound_red = show_message("Choose Red Rocket", "Consolas", WIDTH//40, 8*xu, HEIGHT - (5*yu), WHITE, RED, True)
+            choose_bound_blue = show_message("Choose Blue Rocket", "Consolas", WIDTH//40, 25*xu, HEIGHT - (5*yu), WHITE, BLUE, True)
+            choose_bound_green = show_message("Choose Green Rocket", "Consolas", WIDTH//40, 42*xu, HEIGHT - (5*yu), WHITE, GREEN, True)
 
 
 # -------- Main Program Loop -----------
-def main():                          
-    global set_score
+def main():              
+    set_score = False
+    win = 0
+    lose = 0   
 
-    initRockets()                    
-
-    # local  variables  
+    initRockets()                       
+    choose_bound_red = show_message("Choose Red Rocket", "Consolas", WIDTH//40, 8*xu, HEIGHT - (5*yu), WHITE, RED, True)
+    choose_bound_blue = show_message("Choose Blue Rocket", "Consolas", WIDTH//40, 25*xu, HEIGHT - (5*yu), WHITE, BLUE, True)
+    choose_bound_green = show_message("Choose Green Rocket", "Consolas", WIDTH//40, 42*xu, HEIGHT - (5*yu), WHITE, GREEN, True)
+        
     game_in_play = False
     choice = None
     
     while True:
-        for event in pygame.event.get():
-            if (event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE)):  # end game conditions
+        for event in pygame.event.get():  
+            if (event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE)):  # end game
                 pygame.quit()                          
                 sys.exit()
 
-            # user interactions
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            # button, mouse, or keyboard interaction
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not game_in_play:
                 mouse_pos = pygame.mouse.get_pos()
                 if choose_bound_red.collidepoint(mouse_pos):
                     choice = "Red"
@@ -168,29 +186,31 @@ def main():
 
                 initRockets()
                 game_in_play = True
-                set_score = True
+                set_score = False # Haven't set the score for the new round from not picking a rocket yet
 
-
-        redspeed = random.randint(1, 10)
-        bluespeed = random.randint(1, 10)
-        greenspeed = random.randint(1, 10)
-        
-        if game_in_play:
+        if game_in_play: 
+            redspeed = random.randint(1, 10)
+            bluespeed = random.randint(1, 10)
+            greenspeed = random.randint(1, 10)
             redRect.top -= redspeed
             blueRect.top -= bluespeed
             greenRect.top -= greenspeed
 
         if redRect.top <= 0 or blueRect.top <= 0 or greenRect.top <= 0:
+            
             game_in_play = False
+            if not set_score:
+                if get_winner(choice)[1]=="You Win":
+                    win += 1
+                if get_winner(choice)[1] == "You Lose":
+                    lose +=1
 
-        drawScreen(game_in_play, choice)
+                set_score = True
 
-        if not game_in_play:
-            choose_bound_red = show_message("Choose Red Rocket", "Consolas", WIDTH//40, 8*xu, HEIGHT - (5*yu), WHITE, RED, True)
-            choose_bound_blue = show_message("Choose Blue Rocket", "Consolas", WIDTH//40, 25*xu, HEIGHT - (5*yu), WHITE, BLUE, True)
-            choose_bound_green = show_message("Choose Green Rocket", "Consolas", WIDTH//40, 42*xu, HEIGHT - (5*yu), WHITE, GREEN, True)
+        drawScreen(game_in_play, choice, win, lose)
+
         
-        pygame.display.update()                        
-        clock.tick(60)                                  
+        pygame.display.update()                 
+        clock.tick(60)                          
 #----------------------------------------------------------------            
-main()
+main()  
